@@ -209,9 +209,9 @@ str(ttt)
 bartlett.test(ttt$V1, ttt$V2)
 t.test(V1~V2, ttt, var.equal = T)$p.value
 wilcox.test(V1~V2, ttt)$p.value
+###
 
-
-
+   
 
 
 
