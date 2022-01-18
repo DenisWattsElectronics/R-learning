@@ -211,7 +211,18 @@ t.test(V1~V2, ttt, var.equal = T)$p.value
 wilcox.test(V1~V2, ttt)$p.value
 ###
 
-   
+#####
+df1 <- npk
+summary(df1)
+t <- aov(yield ~ P + N + P:N, data = df1)
+summary(t)
+
+summary(aov(yield ~ N + P + K, data = df1))
+
+df1 <-iris
+
+t <- aov(Sepal.Width ~ Species, df1)
+TukeyHSD(t)
 
 
 
