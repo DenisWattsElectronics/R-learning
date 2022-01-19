@@ -223,6 +223,146 @@ df1 <-iris
 
 t <- aov(Sepal.Width ~ Species, df1)
 TukeyHSD(t)
+###
+
+md2 <- read.csv("therapy_data.csv")
+summary(md2)
+str(md2)
+
+t <- aov(well_being ~ therapy, data = md2)
+summary(t)
+t <- aov(well_being ~ therapy + Error(subject/therapy), data = md2)
+summary(t)
+t <- aov(well_being ~ therapy + price, data = md2)
+summary(t)
+t <- aov(well_being ~ therapy * price, data = md2)
+summary(t)
+t <- aov(well_being ~ therapy * price + Error(subject/(therapy*price)), data = md2)
+summary(t)
+
+###
+pil1 <- read.csv("Pillulkin.csv")
+summary(pil1)
+str(pil1)
+pil1
+pil1$patient <- as.factor(pil1$patient)
+
+t <- aov(temperature ~ pill + Error(patient/pill), data = pil1)
+summary(t)
+
+t <- aov(temperature ~ pill*doctor + Error(patient/(pill*doctor)), data = pil1)
+summary(t)
+
+
+library(ggplot2)
+ggplot(pil1, aes(x = pill, y = temperature)) + 
+  geom_boxplot()
+
+
+str(ToothGrowth)
+library(ggplot2)
+obj <- ggplot(ToothGrowth, aes(x = as.factor(dose), y = len, col = supp, group = supp))+
+  stat_summary(fun.data = mean_cl_boot, geom = 'errorbar', width = 0.1, position = position_dodge(0.2))+
+  stat_summary(fun.data = mean_cl_boot, geom = 'point', size = 3, position = position_dodge(0.2))+
+  stat_summary(fun.data = mean_cl_boot, geom = 'line', position = position_dodge(0.2))
+obj
+###
+
+
+my_calc <- function(x, y){
+  s <- x + y
+  return(s)
+}
+my_calc(2, 3)
+
+my_calc <- function(x, y){
+  s <- x + y
+  d <- x - y
+  return(c(s, d))
+}
+my_calc(2, 3)[1:2]
+
+
+distr1 <- rnorm(100)
+distr1[1:30] <- NA
+distr1[is.na(distr1)] <- mean(distr1, na.rm = T)
+
+my_na_rm <- function(x){
+  x[is.na(x)] <- mean(x, na.rm = T)
+  return(x)
+}
+hist(distr1)
+distr1 <- my_na_rm(distr1)
+
+
+distr1  <- rnorm(100)
+distr1[1:30]  <- NA
+distr1[is.na(distr1)]  <- mean(distr1, na.rm = T)
+
+my_na_rm  <- function(x){
+  if (is.numeric(x)){
+    stat_test  <- shapiro.test(x)
+    if (stat_test$p.value > 0.05){
+      x[is.na(x)]  <- mean(x, na.rm = T)
+      print("NA values were replaced with mean")
+    } else{
+      x[is.na(x)]  <- median(x, na.rm = T)
+      print("NA values were replaced with median")
+    }
+    return(x)
+  } else{
+    print("X is not numeric")
+  }
+}
+
+d1  <- rnorm(2000)
+d2  <- runif(2000)
+
+d1[1:10]  <- NA
+d2[1:10]  <- NA
+
+d1  <- my_na_rm(d1)
+head(d1)
+
+d2  <- my_na_rm(d2)
+head(d2)
+
+#####
+my_vector <- c(1, 2, 3, NA, NA)
+which(is.na(my_vector))
+NA.position <- function(vec){
+  return(which(is.na(vec)))
+}
+
+NA.counter <- function(vec){
+  return(length((which(is.na(vec)))))
+}
+NA.counter(my_vector)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
