@@ -341,6 +341,30 @@ NA.counter(my_vector)
 
 
 
+dir(pattern = "*.csv", path = "Grants data/")
+grants <- data.frame()
+
+for (i in dir(pattern = "*.csv", path = "Grants data/")) {
+  print(i)
+  temp_df <- read.csv( paste0("Grants data/", i) )
+  grants <- rbind(temp_df, grants)
+}
+
+#####
+vec <- c(1, 2, 3, 4, 5, -5, NA)
+sum(vec[vec>0 & !is.na(vec)])
+sum(vec[vec>0], na.rm = T)
+###
+
+
+
+
+
+
+
+
+
+
 
 
 
