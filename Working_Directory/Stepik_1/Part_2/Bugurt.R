@@ -355,12 +355,32 @@ vec <- c(1, 2, 3, 4, 5, -5, NA)
 sum(vec[vec>0 & !is.na(vec)])
 sum(vec[vec>0], na.rm = T)
 ###
+library(ggplot2)
+df  <- mtcars
 
+cor.test(x = df$mpg, y = df$hp)
+fit  <- cor.test(x = df$mpg, y = df$hp)
 
+cor.test(~ mpg + hp, df)
 
+str(fit)
 
+fit$p.value
 
+plot(x = df$mpg, y = df$hp)
 
+ggplot(df, aes(x = mpg, y = hp, col = factor(cyl)))+
+  geom_point(size = 2.5)
+
+#####
+corr.calc <- function(x){
+  return(c(cor.test(x[[1]], x[[2]])$estimate, cor.test(x[[1]], x[[2]])$p.value))
+}
+
+banana <- corr.calc( mtcars[, c(1,5)] )
+banana$p.value
+banana$estimate
+banana
 
 
 
