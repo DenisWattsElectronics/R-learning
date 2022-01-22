@@ -373,6 +373,7 @@ ggplot(df, aes(x = mpg, y = hp, col = factor(cyl)))+
   geom_point(size = 2.5)
 
 #####
+#1
 corr.calc <- function(x){
   return(c(cor.test(x[[1]], x[[2]])$estimate, cor.test(x[[1]], x[[2]])$p.value))
 }
@@ -382,25 +383,35 @@ banana$p.value
 banana$estimate
 banana
 
+#2
+install.packages("gdata")
+library(gdata)
+step6 <-  read.table("step6.csv",  header=TRUE, sep=',' )
+step6
+str(step6)
+
+clear_data <- step6[,sapply(step6, is.numeric)]
+clear_data
+
+corrs <- vector()
+ncol(clear_data)
+
+for (i in 1:(ncol(clear_data)-1)){
+  for (j in (i+1):ncol(clear_data)){
+    print(j    i    "Как печатать i и j в одной строке, чтобы проверить, что на тест идут нужные пары столбцов")
+    corrs <- abs(c(corrs, cor.test(clear_data[, i], clear_data[, j])$estimate))
+  }
+}
+
+corrs
+max(corrs)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+for (i in 1:3){
+  for (j in i:3){
+    print(j)
+  }
+}
 
 
 
