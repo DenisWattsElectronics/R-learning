@@ -392,32 +392,221 @@ str(step6)
 
 clear_data <- step6[,sapply(step6, is.numeric)]
 clear_data
+iris
+
 
 corrs <- vector()
 ncol(clear_data)
 
 for (i in 1:(ncol(clear_data)-1)){
   for (j in (i+1):ncol(clear_data)){
-    print(j    i    "Как печатать i и j в одной строке, чтобы проверить, что на тест идут нужные пары столбцов")
+#    p <- c(i, j)
+#    print(p)
     corrs <- abs(c(corrs, cor.test(clear_data[, i], clear_data[, j])$estimate))
+    return(corrs)
   }
 }
 
 corrs
 max(corrs)
 
+clear_data <- step6[,sapply(step6, is.numeric)]
 
-for (i in 1:3){
-  for (j in i:3){
-    print(j)
+filtered.cor <- function(x){
+  x <- x[,sapply(x, is.numeric)]
+  corrs <- vector()
+  abscorrs <- vector()
+  for (i in 1:(ncol(x)-1)){
+    for (j in (i+1):ncol(x)){
+      corrs <- c(corrs, cor.test(x[, i], x[, j])$estimate)
+      abscorrs <- c(abscorrs, abs(cor.test(x[, i], x[, j])$estimate))
+    }
   }
+  return(corrs[which.max(abscorrs)])
+}
+
+
+test_data <- as.data.frame(list(V4 = c(0.4, 0, -1.5, -1.8, -2.1, -1.7, -2.2, -1.6), V3 = c(1.4, -0.4, 1, -1.1, 0.2, 1.6, 0, 0.6), V6 = c("m", "m", "m", "m", "m", "m", "m", "m"), V1 = c(-0.4, 0.5, -1, 0.5, 0.4, -1.1, 1.8, -1), V8 = c("g", "g", "g", "g", "g", "g", "g", "g"), V5 = c(-1.7, 0, 0.2, -1.9, -0.1, 1.3, 2.2, -0.4), V7 = c("m", "m", "m", "m", "m", "m", "m", "m"), V2 = c(0.4, -0.3, -0.5, -0.2, -0.1, -1.1, 0.2, -1.1)))
+
+ans <- filtered.cor(clear_data)
+ans <- filtered.cor(iris)
+ans <- filtered.cor(test_data)
+ans
+
+library(psych)
+filtered.cor <- function(x){
+  y <- cor(x[sapply(x, is.numeric)])
+  diag(y) <- 0
+  return(y[which.max(abs(y))]) 
 }
 
 
 
+test_data  <- read.csv("https://stepik.org/media/attachments/course/129/test_data.csv")
+test_data <- as.data.frame(list(col1 = c(1.6, 1.69, -0.53, 1.41, 1.39, -1.51, 0.48, -1.34, -0.98, -1.88, -1.67, -1.35, -1.44, 0.88, -1.33, 1.78, -1.51, 0.59, 1.48, -0.94, 1.5, -0.92, -0.21, -0.78, -1.24, 1.58, 1.19, -1.6, -1.57, -1.48), col2 = c(-1.67, -1.18, 0.23, -0.75, -0.69, -0.14, -1.21, 0.24, -0.37, -0.56, -1.91, -1.49, 1.28, -0.84, -0.47, 1.81, 0.75, -0.09, 0, -0.74, 0.61, 0.82, -1.32, -0.04, -2.44, -1.39, 1.06, -0.42, -0.94, -0.64)))
+
+test_data
+
+shapiro.test(test_data[,1])$p.value
+shapiro.test(test_data[,2])$p.value
+
+smart_cor <- function(x){
+  if (shapiro.test(x[,1])$p.value < 0.05 | shapiro.test(x[,2])$p.value < 0.05){
+    return(cor.test(x[,1], x[,2], method = 'spearman')$estimate)
+  }
+  else {
+    return(cor.test(x[,1], x[,2])$estimate)
+  }
+}
+
+smart_cor(test_data)
+
+smart_cor <- function(x){
+  ifelse(shapiro.test(x[[1]])$p.value<0.05|shapiro.test(x[[2]])$p.value<0.05, 
+         cor(x,method = "spearman")[1,2], cor(x, method = "pearson")[1,2])
+}
+
+smart_cor <- function(x){
+  cor(x[[1]], x[[2]], method = if (shapiro.test(x[[1]])$p < 0.05 | shapiro.test(x[[2]])$p < 0.05) "spearman" else "pearson")
+}
+
+###
+library(ggplot2)
+
+df  <- mtcars
+df_numeric  <- df[,c(1,3:7)]
+
+fit  <- lm(mpg ~ hp, df)
+summary(fit)
+
+ggplot(df, aes(hp, mpg))+
+  geom_point(size = 5)+
+  geom_smooth(method = "lm")+
+  facet_grid(.~cyl)
+
+ggplot(df, aes(hp, mpg))+
+  geom_smooth(method = "lm", se = F)+
+  facet_grid(.~cyl)
+
+fitted_values_mpg  <- data.frame(mpg = df$mpg, fitted = fit$fitted.values )
+
+new_hp <- data.frame(hp = c(100, 150, 129, 300))
+new_hp$mpg  <- predict(fit, new_hp)
+
+predict(fit, new_hp)
+
+
+##################################
+
+
+library(psych)
+
+my_df  <- mtcars
+my_df$cyl  <- factor(my_df$cyl, labels = c("four", "six", "eight"))
+fit  <- lm(mpg ~ hp, my_df)
+
+summary(fit)
+
+ggplot(df, aes(hp, mpg))+
+  geom_point(size = 5)+
+  geom_smooth(method = "lm")+
+  facet_grid(.~cyl)
+
+ggplot(df, aes(hp, mpg))+
+  geom_smooth(method = "lm", se = F)+
+  facet_grid(.~cyl)
+
+fitted_values_mpg  <- data.frame(mpg = df$mpg, fitted = fit$fitted.values )
+
+new_hp <- data.frame(hp = c(100, 150, 129, 300))
+new_hp
+new_hp$mpg  <- predict(fit, new_hp)
+new_hp
+predict(fit, new_hp)
+
+my_df <- mtcars
+fit  <- lm(mpg ~ cyl, my_df)
+summary(fit)
+
+ggplot(my_df, aes(cyl, mpg))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme(axis.text = element_text(size=15),
+        axis.title = element_text(size=15, face='bold'))
+
+my_df$cyl  <- factor(my_df$cyl, labels = c("four", "six", "eight"))
+fit  <- lm(mpg ~ cyl, my_df)
+summary(fit)
+
+aggregate(mpg ~ cyl, my_df, mean)
+
+#####
+ttt <- read.table("dataset_11508_12.txt", sep = " ")
+fit <- lm(V1 ~ V2, ttt)
+summary(fit)
+fit$coefficients
+
+
+fit <- lm(mpg ~ disp + wt, mtcars)
+fit$coefficients # коэффициенты модели
+
+str(diamonds)
+
+
+fit_coef <- lm(price ~ depth, diamonds, subset = (carat==0.46 & cut=="Ideal"))$coefficients
+fit_coef
+
+df_y <- iris[,c(1,4)] 
+df_n <- iris[,1:2]
+
+ifelse(diamonds$price >= mean(diamonds$price), 1, 0)
+
+
+regr.calc <- function(df){
+  if (summary(lm(df[,1] ~ df[,2], df))$coefficients[2,4] < 0.05){
+    df$fit <- lm(df[,1] ~ df[,2], df)$fitted.values
+    return(df)
+  }
+  else{
+    print("There is no sense in prediction")
+  }
+}  
+
+df_yy <- df_y
+df_yy$fit <- 1
+df_yy
+
+regr.calc(df_n)
+
+ttt <- lm(df_y[,1] ~ df_y[,2], df_y)
+ttt$fitted.values
+
+vvv <- regr.calc(df_y)
+vvv
+
+
+df <- mtcars
+my_df <- mtcars
+fit  <- lm(mpg ~ cyl, my_df)
+summary(fit)
+
+ggplot(my_df, aes(cyl, mpg))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme(axis.text = element_text(size=15),
+        axis.title = element_text(size=15, face='bold'))
+
+ggplot(df, aes(hp, mpg))+
+  geom_point(size = 5)+
+  geom_smooth(method = "lm")+
+  facet_grid(.~cyl)
 
 
 
+ggplot(iris, aes(Sepal.Width, Petal.Width, col = Species))+
+  geom_point() + 
+  geom_smooth(method = "lm")
 
+###
 
 
