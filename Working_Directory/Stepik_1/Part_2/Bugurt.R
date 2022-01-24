@@ -609,4 +609,65 @@ ggplot(iris, aes(Sepal.Width, Petal.Width, col = Species))+
 
 ###
 
+?swiss
+str(swiss)
+
+hist(swiss$Fertility, col = 'red')
+
+fit <- lm(Fertility ~ Examination + Catholic, data = swiss)
+summary(fit)
+
+
+fit2 <- lm(Fertility ~ Examination*Catholic, data = swiss)
+summary(fit2)
+
+
+confint(fit2)
+
+###
+test_data <- read.csv("https://stepic.org/media/attachments/course/129/fill_na_test.csv")
+test_data <- as.data.frame(list(x_1 = c(10, 8, 11, 8, 10, 9, 9, 11, 11, 7),
+                                x_2 = c(33, 43, 40, 27, 30, 31, 26, 37, 39, 26), y = c(13, 12, 17, 18, 10, NA, NA, 5, 10, 14)))
+test_data
+str(test_data)
+
+fit_test <- lm(y ~ x_1*x_2, test_data)
+summary(fit_test)
+confint(fit_test)
+
+ifelse(diamonds$carat >= mean(diamonds$carat), 1, 0)
+
+fill_na <- function(x){
+  fit_test <- lm(y ~ x_1 + x_2, x)
+  y_full <- predict(fit_test, x)
+  x$y_full <- x$y
+  x$y_full[is.na(x$y)] <- y_full[is.na(x$y)]
+  return(x)
+}
+
+fill_na <- function(x)
+  data.frame(x, y_full = ifelse(is.na(x$y), predict(lm(y ~ x_1 + x_2, x), x), x$y))
+
+fill_na(test_data)
+
+
+my_df = iris[,c(1,4)]
+df
+
+df <- mtcars[,c(1, 3, 4, 5, 6)]
+str(df)
+fit_test <- lm(wt ~ mpg + disp + hp, df)
+summary(fit_test)
+
+?attitude
+str(attitude)
+summary(lm(rating ~ complaints * critical, attitude))
+confint(lm(rating ~ complaints * critical, attitude))
+
+
+
+
+
+
+
 
