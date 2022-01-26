@@ -786,31 +786,40 @@ shapiro.test(sqrt(my_vector))
 shapiro.test(log(my_vector))
 
 
+library(QuantPsyc)
+lmm <- lm(mtcars[,1], mtcars[,3], mtcars)
+lm.beta()
+mtcars[,c(1,3)]
+mtcars[,1]
+mtcars[,3]
+
+beta.coef <- function(x){
+  x[,1] <- scale(x[,1])
+  x[,2] <- scale(x[,2])
+  ttt <- lm(x[,1] ~ x[,2], x)$coefficients
+  return(ttt)
+}
+
+beta.coef(mtcars[,c(1,3)])
+summary(lll)
+lll$coefficients
 
 
+BBB <- c(1, 1, 1, 1, 1)
 
 
+normality.test  <- function(x){
+#  y <- unlist(lapply(x, shapiro.test))
+  y <- sapply(x, shapiro.test)["p.value",]
+  return(y)
+} 
+
+nnn <- normality.test(mtcars[,1:6])
+nnn
+str(nnn)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+lapply(mtcars[,1:6], shapiro.test)
 
 
 
