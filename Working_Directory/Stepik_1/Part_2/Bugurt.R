@@ -889,26 +889,163 @@ csv <- read.csv(file = "homosc.csv")
 x <- gvlma(DV ~ IV, csv)
 summary(x)
 
-fits <- lm(mpg ~ disp, mtcars)
+
+fit <- lm(mpg ~ disp, mtcars)
+fit <- lm(mpg ~ wt, mtcars)
 resid.norm  <- function(fit){
-  resids <- fit$resid
-  shap <- shapiro.test(resids)
-  return(resids)
+  shap <- shapiro.test(fit$resid)$p.value
+  ifelse(shap < 0.05, color <- 'red', color <- 'green')
+  ggplot(fit, aes(x = fit$resid)) + 
+    geom_histogram(binwidth = 0.5, fill = color)
   }
 
-my_plot <- resid.norm(fits)
-my_plot
+resid.norm(fit)
 
 ggplot(my_plot, aes()) + 
   geom_histogram(binwidth = 1, fill = 'red')
 
 str(fits)
 
+#---
+x1 <- rnorm(30) # создадим случайную выборку
+x2 <- rnorm(30) # создадим случайную выборку
+x3  <- x1 + 5 # теперь коэффициент корреляции x1 и x3 равен единице
+my_df <- data.frame(var1 = x1, var2 = x2, var3 = x3)
+
+
+high.corr <- function(x){
+  co <- cor(my_df)     
+  diag(co) <- 0
+  co <- abs(round(co, digits = 3))
+  max_item <- which(co == max(co), arr.ind = T)
+  return(c(colnames(co)[max_item[1]], rownames(co)[max_item[2]]))
+  }
+
+high.corr(my_df)
+
+co <- cor(my_df)     
+diag(co) <- 0
+co <- abs(round(co, digits = 3))
+max_item <- which(co == max(co), arr.ind = T)
+co
+colnames(co)[max_item[1]]
+rownames(co)[max_item[2]]
+max_item
+
+###
+
+library(ggplot2)
+
+my_df <- read.csv("train.csv", sep=";")
+str(my_df)
+
+ggplot(my_df, aes(read, math, col = gender))+
+  geom_point(size = 5)+
+  facet_grid(.~hon)+
+  theme(axis.text=element_text(size=25),
+        axis.title=element_text(size=25,face="bold"))
+
+
+fit  <- glm(hon ~ read + math + gender, my_df, family = "binomial")
+summary(fit)
+
+exp(fit$coefficients)
+
+head(predict(object = fit))
+
+head(predict(object = fit, type = "response"))
+
+my_df$prob  <- predict(object = fit, type = "response")
 
 
 
 
+library(ROCR)
+
+pred_fit <- prediction(my_df$prob, my_df$hon)
+perf_fit <- performance(pred_fit,"tpr","fpr")
+plot(perf_fit, colorize=T , print.cutoffs.at = seq(0,1,by=0.1))
+auc  <- performance(pred_fit, measure = "auc")
+str(auc)
 
 
 
+perf3  <- performance(pred_fit, x.measure = "cutoff", measure = "spec")
+perf4  <- performance(pred_fit, x.measure = "cutoff", measure = "sens")
+perf5  <- performance(pred_fit, x.measure = "cutoff", measure = "acc")
 
+plot(perf3, col = "red", lwd =2)
+plot(add=T, perf4 , col = "green", lwd =2)
+plot(add=T, perf5, lwd =2)
+
+legend(x = 0.6,y = 0.3, c("spec", "sens", "accur"), 
+       lty = 1, col =c('red', 'green', 'black'), bty = 'n', cex = 1, lwd = 2)
+
+abline(v= 0.225, lwd = 2)
+
+
+my_df$pred_resp  <- factor(ifelse(my_df$prob > 0.225, 1, 0), labels = c("N", "Y"))
+
+my_df$correct  <- ifelse(my_df$pred_resp == my_df$hon, 1, 0)
+
+
+ggplot(my_df, aes(prob, fill = factor(correct)))+
+  geom_dotplot()+
+  theme(axis.text=element_text(size=25),
+        axis.title=element_text(size=25,face="bold"))
+
+mean(my_df$correct)
+
+
+test_df  <- read.csv("test.csv", sep = ";")
+test_df$hon  <- NA
+
+test_df$hon  <- predict(fit, newdata = test_df, type = "response")
+View(test_df)
+
+
+#####
+
+log_coef  <- glm(am ~ disp + vs + mpg, mtcars, family = "binomial")$coefficients
+summary(fit)
+str(fit)
+fit$coefficients
+
+
+library("ggplot2")
+
+ggplot(ToothGrowth, aes(x = supp, y = len, fill = factor(dose))) + 
+  geom_boxplot()
+
+
+obr <- read.csv("data.csv")
+str(obr)
+obr$rank <- factor(obr$rank)
+obr$admit <- factor(obr$admit)
+obr_NA <- obr[is.na(obr$admit)==T, 1:4]
+obr_noNA<- obr[is.na(obr$admit)==F, 1:4]
+rm(fit)
+fit <- glm(admit ~ rank*gpa, obr_noNA, family = "binomial")
+summary(fit)
+obr_NA$admit <-predict(fit, newdata = obr_NA, type = "response")
+
+obr_NA$yes <- ifelse(obr_NA$admit >= 0.4, 1, 0)
+
+obr_NA
+
+sum(obr_NA$yes)
+
+
+install.packages("stargazer")
+library(stargazer)
+install.packages("xtable")
+library(xtable)
+fit1  <- lm(mpg ~ cyl+disp, mtcars)
+fit2 <- aov(mpg~am*vs,mtcars)
+fit_table1 = xtable(fit1)
+fit_table2 = xtable(fit2)
+print(fit_table1, type = "html", file = "fit_table1.html")
+print(fit_table2, type = "html", file = "fit_table2.html")
+stargazer(fit1, type = "html",
+          dep.var.labels = "mpg",
+          covariate.labels = c("cyl","disp"), out = "models1.html")
