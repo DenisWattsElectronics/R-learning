@@ -821,6 +821,93 @@ str(nnn)
 
 lapply(mtcars[,1:6], shapiro.test)
 
+###
+
+ggplot(swiss, aes(x = Examination, y = Education)) + 
+  geom_point() + 
+  geom_smooth()
+
+lm1 <- lm(Education ~ Examination, swiss)
+summary(lm1)
+
+
+swiss$Examination_squared <- (swiss$Examination)^2
+
+lm2 <- lm(Education ~ Examination + Examination_squared, swiss)
+summary(lm2)
+
+
+anova(lm2, lm1)
+
+
+swiss$lm1_fitted <- lm1$fitted
+swiss$lm2_fitted <- lm2$fitted
+swiss$lm1_resid <- lm1$resid
+swiss$lm2_resid <- lm2$resid
+swiss$obs_number <- 1:nrow(swiss)
+
+ggplot(swiss, aes(x = Examination, y = Education)) + 
+  geom_point(size = 3) + 
+  geom_line(aes(x = Examination, y = lm1_fitted), col = 'red', lwd=1) +
+  geom_line(aes(x = Examination, y = lm2_fitted), col = 'blue', lwd=1)
+
+
+ggplot(swiss, aes(x = lm1_fitted, y = lm1_resid)) + 
+  geom_point(size = 3) + geom_hline(yintercept = 0, col = 'red', lwd = 1)
+
+ggplot(swiss, aes(x = lm2_fitted, y = lm2_resid)) + 
+  geom_point(size = 3) + geom_hline(yintercept = 0, col = 'red', lwd = 1)
+
+
+ggplot(swiss, aes(x = lm1_resid)) + 
+  geom_histogram(binwidth = 4, fill = 'white', col = 'black')
+
+qqnorm(lm1$residuals)
+qqline(lm1$residuals)
+
+shapiro.test(lm1$residuals)
+
+
+ggplot(swiss, aes(x = lm2_resid)) + 
+  geom_histogram(binwidth = 4, fill = 'white', col = 'black')
+
+qqnorm(lm2$residuals)
+qqline(lm2$residuals)
+
+shapiro.test(lm2$residuals)
+
+
+par(mfrow=c(2,2)) ; plot(lm2)
+
+
+
+
+#####
+
+library(gvlma)
+csv <- read.csv(file = "homosc.csv")
+x <- gvlma(DV ~ IV, csv)
+summary(x)
+
+fits <- lm(mpg ~ disp, mtcars)
+resid.norm  <- function(fit){
+  resids <- fit$resid
+  shap <- shapiro.test(resids)
+  return(resids)
+  }
+
+my_plot <- resid.norm(fits)
+my_plot
+
+ggplot(my_plot, aes()) + 
+  geom_histogram(binwidth = 1, fill = 'red')
+
+str(fits)
+
+
+
+
+
 
 
 
