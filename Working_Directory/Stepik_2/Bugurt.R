@@ -75,23 +75,34 @@ lapply(d, function(x) x[!is.na(x)])
 
 lapply(d, function(y) ifelse(is.na(y), sum(y, na.rm = TRUE), y))
 
+dataset <- as.data.frame(list(name = c("p4@HPS1", "p7@HPS2", "p4@HPS3", "p7@HPS4", "p7@HPS5", 
+                                         "p9@HPS6", "p11@HPS7", "p10@HPS8", "p15@HPS9"), 
+                                expression = c(118.84, 90.04, 106.6, 104.99, 93.2, 66.84, 90.02, 
+                                               108.03, 111.83)))
+test_data
+names = c("HPS5", "HPS6", "HPS9", "HPS2", "HPS3", "HPS7", "HPS4", "HPS8")
+names
+str(dataset)
+dataset
+my_names <- function (dataset, names){
+  return(sapply(names, function(x) dataset[grepl(x, dataset$name),]))
+}
+
+my_names <- function (dataset, names){
+  return(as.data.frame(t(sapply(names, function(x) dataset[grepl(x, dataset$name),]))))
+}
+
+my_names <- function (dataset, names){
+  z <- as.data.frame(t(sapply(names, function(x) dataset[grepl(x, dataset$name),])))
+  z[, 2] <- as.numeric(z[, 2])
+  return(z)
+  }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+my_names(test_data, names)
+grepl(names[1], dataset$name)
+x[, 2] <- as.numeric(x[, 2])
+x
 
 
 
