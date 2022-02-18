@@ -110,28 +110,85 @@ y <- rnorm(100)
 factor1 <- rep(1:2, each=50)
 factor2 <- rep(3:4, 50)
 factors <- c("factor1", "factor2")
-lm(as.formula(paste("y~", paste(factors, collapse="+"))))
+aaa <- lm(as.formula(paste("y~", paste(factors, collapse="+"))))
+aaa$coefficients
 
+str(swiss)
+shares <- sapply(swiss[-1], function(x) shapiro.test(x)$p.value)
+shares <- sapply(swiss[-1], function(x) shapiro.test(x))
+swi <- swiss[-1]
+swi <- swi[shares > 0.05]
+swi
+swi <- cbind(swiss[1], swi)
+
+lm(swi[ ,1] ~ ., swi[-1])
 
 smart_lm <- function(x){
-  
-  
+  shares <- sapply(x[-1], function(y) shapiro.test(y)$p.value)
+  swi <- x[-1]
+  swi <- swi[shares > 0.05]
+  if (ncol(swi) > 0){
+    swi <- cbind(x[1], swi)
+    lm(swi[ ,1] ~ ., swi[-1])$coefficients
+  }
+  else {
+    print("There are no normal variables in the data")
+  }
 }
 
 smart_lm(swiss)
 
+test_data <- read.csv("https://stepik.org/media/attachments/course/724/test.csv")
+smart_lm(test_data)
+
+test_data <- data.frame(x = 1:100, y = 1:100, z = 1:100)
+smart_lm(test_data)
+#####################################################################################
+str(t.test(iris[, 1:4], mu=0))
+lapply(iris[, 1:4], function(x) str(t.test(x, mu = 0)))
+
+str(t.test(iris[,1], mu = 4))
+t.test(iris[,1], mu = 4)$statistic
+t.test(iris[,1], mu = 4)$parameter
+t.test(iris[,1], mu = 4)$p.value
+
+lapply(iris[, 1:4], function(x) c(t.test(iris[,1:4], mu = 4)$statistic, t.test(iris[,1:4], mu = 4)$parameter, t.test(iris[,1:4], mu = 4)$p.value))
+
+one_sample_t <- function(test_data, general_mean){
+  test_data_num <- test_data[unlist(lapply(test_data, is.numeric))] 
+  return(lapply(test_data_num, function(x) c(t.test(x, mu = general_mean)$statistic, t.test(x, mu = general_mean)$parameter, t.test(x, mu = general_mean)$p.value)))
+  }
+
+general_mean <- 4
+test_data <- iris[, 1:4]
+test_data_num <- test_data[unlist(lapply(test_data, is.numeric))] 
+test_data
+test_data_num
+lapply(test_data_num, function(x) c(t.test(x, mu = general_mean)$statistic, t.test(x, mu = general_mean)$parameter, t.test(x, mu = general_mean)$p.value))
+
+one_sample_t(iris[, 1:4], 4)
+
+test_data <- as.data.frame(list(V1 = c(28, 43, 24, 29, 26, 28, 56, 38, 41, 49), V2 = c("A", "A", "B", "A", "A", "A", "B", "A", "A", "A"), V3 = c(51, 39, 27, 48, 49, 36, 38, 21, 32, 38), V4 = c(27, 38, 33, 50, 50, 40, 25, 36, 49, 45), V5 = c(30, 32, 47, 47, 46, 40, 31, 37, 44, 37), V6 = c(34, 29, 51, 42, 30, 44, 50, 37, 54, 44), V7 = c(43, 33, 38, 42, 30, 35, 26, 40, 31, 33), V8 = c("A", "B", "B", "A", "B", "B", "B", "B", "B", "B")))
+test_data <- as.data.frame(list(V1 = c(33, 46, 40, 29, 37, 37, 44, 46, 41, 29), V2 = c(47, 38, 43, 34, 45, 39, 21, 49, 31, 26), V3 = c(38, 47, 39, 47, 44, 23, 41, 31, 47, 36), V4 = c("A", "B", "A", "B", "B", "A", "A", "A", "A", "A"), V5 = c(36, 35, 56, 25, 33, 26, 35, 38, 46, 36), V6 = c(39, 47, 45, 35, 53, 35, 24, 32, 38, 42), V7 = c(43, 35, 45, 37, 36, 35, 40, 36, 31, 52), V8 = c(34, 56, 44, 31, 38, 32, 29, 25, 24, 39), V9 = c(29, 21, 45, 27, 36, 43, 44, 26, 32, 35), V10 = c("B", "A", "A", "B", "B", "A", "B", "A", "A", "B"
+)))
+nnn <- test_data[unlist(lapply(test_data, is.numeric))]
+nnn
+one_sample_t(test_data, 4)
+test_data
+
+list(V1 = c(15.48, 9, 0), V2 = c(10.36, 9, 0), V3 = c(13.06, 9, 0), V5 = c(10.38, 9, 0), V6 = c(12.27, 9, 0), V7 = c(16.46, 9, 0), V8 = c(9.29, 9, 0), V9 = c(10.23, 9, 0))
+
+normality_tests <- lapply(iris[, 1:4], shapiro.test)
+normality_tests
+
+lapply(normality_tests, function(x) x$p.value)
+normality_tests$Sepal.Width$p.value
+
+str(normality_tests[])
 
 
-
-
-
-
-
-
-
-
-
-
-
+get_p_value <- function(test_list){
+  lapply(test_list, function(x) x$p.value)
+}
 
 
