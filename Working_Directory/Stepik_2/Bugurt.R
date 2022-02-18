@@ -104,8 +104,21 @@ grepl(names[1], dataset$name)
 x[, 2] <- as.numeric(x[, 2])
 x
 
+###
+set.seed(0)
+y <- rnorm(100)
+factor1 <- rep(1:2, each=50)
+factor2 <- rep(3:4, 50)
+factors <- c("factor1", "factor2")
+lm(as.formula(paste("y~", paste(factors, collapse="+"))))
 
 
+smart_lm <- function(x){
+  
+  
+}
+
+smart_lm(swiss)
 
 
 
