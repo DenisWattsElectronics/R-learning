@@ -223,6 +223,10 @@ arrange
 mutate
 rename
 
+library(scales)
+
+
+
 my_df <- mtcars %>% 
   select(mpg, hp, am, vs) %>% 
   filter(mpg > 14 & hp > 100) %>% 
@@ -231,25 +235,45 @@ my_df <- mtcars %>%
   rename("Miles per gallon" = mpg, "Gross horsepower" = hp)
 
 
-my_data <- data_frame(x = rnorm(10000), y = rnorm(10000), 
-                      f = factor(rep(1:2, 5000)))
+my_data <- data_frame(x = rnorm(10000), y = rnorm(10000))
+my_data
 
-log_transform <- function(test_data){
-  mutate_each(test_data, funs((. - max(.))/(max(.) - min(.)) + 1))
-  return(mutate_each(test_data, funs(log(.))))
-}
+my_data <- as.data.frame(list(V1= c(1.5, -0.1, 2.5, -0.3, -0.8),
+                                V2= c(-0.9, -0.3, -2.4, 0.0,  0.4),
+                                V3= c(-2.8, -3.1, -1.8, 2.1, 1.9),
+                                V4 =c('A', 'B', 'B', 'B', 'B')))
 
-log_transform(my_data)
-
-
-
-
-
+a <- my_data %>% mutate_if(is.numeric, (~. - min(.)))
+a
+b <- a %>% mutate_if(is.numeric, ((~./(max(.) - min(.))+1)))
+b
 
 
 
+b %>% mutate_if(is.numeric, log(x[1,1]))
+mutate_each(b, funs(ifelse(is.numeric(.), log(.), .)))
+mutate_each(b, funs(ifelse(is.numeric(.), sapply(., function(.) log(.)), .)))
 
 
+
+my_data %>% mutate_if(is.numeric, (~max(.) - min(.)))
+
+
+
+my_data %>% mutate_if(is.numeric, log(rescale(~., to = c(1,2))))
+
+
+test_data <- as.data.frame(list(V1= c(1.5, -0.1, 2.5, -0.3, -0.8),
+                              V2= c(-0.9, -0.3, -2.4, 0.0,  0.4),
+                              V3= c(-2.8, -3.1, -1.8, 2.1, 1.9),
+                              V4 =c('A', 'B', 'B', 'B', 'B')))
+
+mutate_each(test_data, funs(ifelse(is.numeric(.), log(.), .))) 
+
+test_data <- as.data.frame(list(V1 = c("A", "B", "A", "B", "A"), V2 = c(0, 0.2, 1.6, 0.2, 0.2)))
+
+
+test_data %>% mutate_if(is.numeric, ~log(rescale(.x, to = c(1,2))))
 
 
 
