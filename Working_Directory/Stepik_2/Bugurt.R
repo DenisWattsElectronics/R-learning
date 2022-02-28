@@ -275,6 +275,71 @@ test_data <- as.data.frame(list(V1 = c("A", "B", "A", "B", "A"), V2 = c(0, 0.2, 
 
 test_data %>% mutate_if(is.numeric, ~log(rescale(.x, to = c(1,2))))
 
+###############
+
+test_data <- read.csv("https://stepic.org/media/attachments/course/724/salary.csv")
+test_data
+str(test_data)
+
+library(dplyr)
+descriptive_stats <- function(xdf){
+  gr_xdf <-  group_by(xdf, gender, country)
+  summarise(gr_xdf,
+            n = n(),
+            mean = mean(salary, na.rm=TRUE),
+            sd = sd(salary, na.rm=TRUE),
+            median = median(salary, na.rm=TRUE), 
+            first_quartile = quantile(salary, na.rm=TRUE, probs = 0.25),
+            third_quartile = quantile(salary, na.rm=TRUE, probs = 0.75),
+            na_values = sum(is.na(salary)))
+}
+descriptive_stats(test_data)
+
+str(diamonds)
+
+aaa <- slice(arrange(diamonds, desc((price), .by_group = T)), 1:10)
+aaa <- arrange(diamonds, desc((price)))
+high_price <- data_frame(color = aaa$color, price = aaa$price)
+high_price
+
+head(high_price)
+
+str(diamonds)
+slice(group_by(diamonds, price), 10)
+
+high_price <- rbind(diampnds())
+
+
+
+high_price <- diamonds %>% group_by(color) %>% select(color, price) %>% arrange(desc(price), .by_group = T) %>% slice(1:10)
+high_price
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
