@@ -124,13 +124,27 @@ iris_norma_check_all()
 # t-test, but in this case it isn't useful due to three levels in Species 
 df1 <- subset(df, Species != "setosa")
 t.test(Sepal.Length ~ Species, df1)
+wilcox.test(Sepal.Length ~ Species, df1)
 
+bartlett.test(Sepal.Length  ~ Species, df1)
 
+ggplot(df1, aes(Species, Sepal.Length))+
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", 
+               width = 0.1)+
+  stat_summary(fun.y = mean, geom = "point", size = 4)
 
+ggplot(df1, aes(Species, Sepal.Length))+
+  stat_summary(fun.data = mean_cl_normal, geom = "pointrange", 
+               size = 2)
 
+# ANOVA AOV
 
-
-
+fit5 <- aov(Sepal.Length ~ Species, data=df)
+summary(fit5)
+summary(aov(Sepal.Length ~ Species, data=df))
+summary(aov(Sepal.Width ~ Species, data=df))
+summary(aov(Petal.Length ~ Species, data=df))
+summary(aov(Petal.Width ~ Species, data=df))
 
 
 

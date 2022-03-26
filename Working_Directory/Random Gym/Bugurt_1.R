@@ -21,7 +21,7 @@ anova() di, second step
 pairs()
 shapiro.test(lm1$residuals) - test of normality
 homoscedacity and other must to be remembered!
-
+bartlett.test() - check dispersions equality 
 #####
 
 str(iris)
